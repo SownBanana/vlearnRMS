@@ -4,10 +4,13 @@ from flask import Flask
 from flask import render_template
 from flask_cors import CORS, cross_origin
 import mysql.connector as mysql
-
+from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://banana:banana@mysql:3306/rms'
+db = SQLAlchemy(app)
+
 
 def getMysqlConnection():
     return mysql.connect(user='banana', host='mysql',password="banana", port='3306', database='rms')
@@ -21,10 +24,16 @@ def home():
 @app.route('/db')
 def db():
     print('==============>');
-    db = getMysqlConnection()
-    if db :
+    if db:
         return "ok"
-    return "not ok"
+    else :
+        return "not ok"
+    # try:
+    #     db = getMysqlConnection()
+    #     return "db ok"
+    # except:
+    #     return "smth gone not ok"
+
 
 
 if __name__ == "__main__":
