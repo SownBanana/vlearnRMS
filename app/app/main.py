@@ -1,9 +1,16 @@
 import sys
-from os import environ
+import os
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS, cross_origin
+import numpy as np
+import pandas as pd 
 import mysql.connector as mysql
+from app.models.CF import CF
 app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
+data_file = os.path.join(basedir, 'static/ex.txt')
+
+global rms  
 
 def getMysqlConnection():
     return mysql.connect(
@@ -42,6 +49,8 @@ def users():
 
 @app.route('/api/train', methods=['GET'])
 def train():
+    global rms  
+    print("Train ===========>")
     cursor = db.cursor()
 
     cursor.execute("SELECT student_id, course_id, rate FROM course_student")
@@ -52,14 +61,40 @@ def train():
     print(results)
     for result in results:
         rs += ' '.join(map(str,result)) + '\n'
+
+    Y_data_real = np.asarray(results)
+
+    r_cols = ['user_id', 'item_id', 'rating']
+    ratings = pd.read_csv(data_file, sep = ' ', names = r_cols, encoding='latin-1')
+    Y_data = ratings.to_numpy()
     
-    return rs 
+    rms = CF(Y_data, k = 2)
+    rms.fit()
+
+    return jsonify({"status":"success"})
 
 
 @app.route('/api/users/<int:id>', methods=['GET'])
-def get_user(id):
-    rs = User.query.get(id)
-    return jsonify(user=rs.serialize);
+def recommend_user(id):
+    # global rms  
+    try:
+        recommended_items = rms.recommend(id)
+        print ('Recommendation item: ', recommended_items, ' for user ', id)
+    except:
+        train()
+        recommended_items = rms.recommend(id)
+        print ('Recommendation item: ', recommended_items, ' for user ', id)
+    return jsonify(recommended_items)
+
+@app.route('/api/users/all', methods=['GET'])
+def recommend_all():
+    # global rms  
+    try:
+        rs = rms.print_recommendation()
+    except:
+        train()
+        rs = rms.print_recommendation()
+    return jsonify(rs)
 
 
 if __name__ == "__main__":
