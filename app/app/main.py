@@ -7,6 +7,8 @@ import pandas as pd
 import mysql.connector as mysql
 from app.models.CF import CF
 app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 data_file = os.path.join(basedir, 'static/ex.txt')
 
@@ -34,6 +36,7 @@ def dbroute():
 
 @app.route('/api/users', methods=['GET'])
 def users():
+    print("Users ===========>")
     cursor = db.cursor()
 
     cursor.execute("SELECT * FROM users")
@@ -62,12 +65,18 @@ def train():
     for result in results:
         rs += ' '.join(map(str,result)) + '\n'
 
-    Y_data_real = np.asarray(results)
+    Y_data = np.asarray(results)
+
+    print("==Y_data")
+    print(Y_data)
 
     r_cols = ['user_id', 'item_id', 'rating']
     ratings = pd.read_csv(data_file, sep = ' ', names = r_cols, encoding='latin-1')
-    Y_data = ratings.to_numpy()
+    Y_data_test = ratings.to_numpy()
     
+    print("==Y_data_test")
+    print(Y_data_test)
+
     rms = CF(Y_data, k = 2)
     rms.fit()
 
