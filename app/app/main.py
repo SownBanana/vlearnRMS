@@ -56,7 +56,7 @@ def train():
     print("Train ===========>")
     cursor = db.cursor()
 
-    cursor.execute("SELECT student_id, course_id, rate FROM course_student")
+    cursor.execute("SELECT student_id, course_id, rate FROM course_student WHERE rate IS NOT NULL")
 
     results = cursor.fetchall()
 
