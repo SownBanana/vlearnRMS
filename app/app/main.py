@@ -70,12 +70,12 @@ def train():
     print("==Y_data")
     print(Y_data)
 
-    r_cols = ['user_id', 'item_id', 'rating']
-    ratings = pd.read_csv(data_file, sep = ' ', names = r_cols, encoding='latin-1')
-    Y_data_test = ratings.to_numpy()
+    # r_cols = ['user_id', 'item_id', 'rating']
+    # ratings = pd.read_csv(data_file, sep = ' ', names = r_cols, encoding='latin-1')
+    # Y_data_test = ratings.to_numpy()
     
-    print("==Y_data_test")
-    print(Y_data_test)
+    # print("==Y_data_test")
+    # print(Y_data_test)
 
     rms = CF(Y_data, k = 2)
     rms.fit()

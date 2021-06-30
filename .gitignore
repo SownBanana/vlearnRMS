@@ -7,3 +7,4 @@ mysql/dbdata/ib_buffer_pool
 mysql/dbdata/ib_logfile0
 mysql/dbdata/ibdata1
 mysql/dbdata/ibtmp1
+app/app/static/ratings.csv

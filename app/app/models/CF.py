@@ -11,6 +11,7 @@ class CF(object):
     def __init__(self, Y_data, k, dist_func = cosine_similarity):
         super(CF, self).__init__()
         self.Y_data = Y_data
+        # k neighbor 
         self.k = k
         self.dist_func = dist_func
         self.Ybar_data = None
@@ -30,6 +31,8 @@ class CF(object):
         self.Ybar_data = self.Y_data.copy()
         self.mu = np.zeros((self.n_users,))
         for n in range(self.n_users):
+            if n % 1000 == 0:
+                print (n, '/', self.n_users)
             # row indices of rating done by user n
             # since indices need to be integers, we need to convert
             ids = np.where(users == n)[0].astype(np.int32)
@@ -82,9 +85,11 @@ class CF(object):
         # How did each of 'near' users rate item i
         r = self.Ybar[i, users_rated_i[a]]
         if normalized:
-            return (r*nearest_s)[0]/np.abs(nearest_s).sum()
-
-        return (r*nearest_s)[0]/np.abs(nearest_s).sum() + self.mu[n]
+            return (r*nearest_s)[0]/(np.abs(nearest_s).sum() + 1e-8)
+        rs = (r*nearest_s)[0]/(np.abs(nearest_s).sum() + 1e-8) + self.mu[u]
+        if np.isnan(rs):
+            rs = self.mu[u]
+        return rs
     
     def recommend(self, u):
         """
