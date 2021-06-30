@@ -7,7 +7,7 @@ services:
   app:
     build: ./
     ports:
-      - 8090:80
+      - 80:80
     volumes:
       - ./app:/app
     environment:
